@@ -1,0 +1,5 @@
+# Claude project-level settings (may contain local paths)
+.claude/settings.local.json
+
+# Node
+node_modules/
