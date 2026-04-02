@@ -92,6 +92,56 @@ Cursor Agent = 實作者
 
 ---
 
+### `hims-code-archaeologist-skill`
+
+> 對 .NET / ASP.NET / MSSQL 系統進行軟體考古（Software Archaeology）。
+> 透過 7 個分析 Phase，系統性地發現技術債、架構漂移、依賴腐敗與死程式碼。
+> **完全唯讀 — 不修改任何原始碼。**
+
+**安裝方式**：
+```bash
+mkdir -p ~/.claude/skills/hims-code-archaeologist
+cp skills/hims-code-archaeologist/SKILL.md ~/.claude/skills/hims-code-archaeologist/SKILL.md
+```
+
+**適用語言棧**：C# / .NET / ASP.NET / MSSQL  
+**支援 OS**：Windows / Linux / macOS
+
+**觸發時機**：
+- 接手遺留 .NET 系統，需要評估風險
+- 重構或現代化前的技術債盤點
+- 找出無文件記錄的依賴關係
+- 分析架構是否符合分層設計（Controllers → Services → Domain → Infrastructure）
+
+**7 個分析 Phase**：
+
+| Phase | 名稱 | 主要工具 | 說明 |
+|-------|------|---------|------|
+| 0 | Dependency Check | bash | 檢測環境工具，缺工具時降級而非中止 |
+| 1 | Historical Excavation | git | commit 頻率、hotfix 率、高 churn 檔案 |
+| 2 | Dependency Archaeology | dotnet CLI + rg | NuGet 過期/廢棄套件、循環 ProjectReference |
+| 3 | Structural Decay | python3 + jscpd | 大型類別、長方法（>50行）、重複程式碼 |
+| 4 | Architecture Drift | rg | 層次違規（Domain 引用 Controller）、Controller 直連 DB |
+| 5 | Test Coverage | dotnet test + coverlet | 無測試的複雜檔案、測試壞味道（過度 mock、flaky） |
+| 6 | Documentation Decay | git + jq | 過時 TODO、config key 是否被引用、文件新鮮度 |
+| 7 | Dead Code | Roslyn + python3 + rg | 孤立型別、註解掉的程式碼、未被呼叫的 SQL 物件 |
+
+**依賴工具**（缺少時會降級，不會中止）：
+
+| 工具 | 用途 | Windows 安裝 |
+|------|------|-------------|
+| `git` | 所有歷史分析（必要） | 通常已安裝 |
+| `dotnet` | NuGet 分析（必要） | dotnet.microsoft.com |
+| `rg` (ripgrep) | 程式碼搜尋（建議） | `winget install BurntSushi.ripgrep.MSVC` |
+| `python3` | 循環依賴、死程式碼腳本（建議） | `winget install Python.Python.3` |
+| `jq` | JSON config 分析（選用） | `winget install jqlang.jq` |
+| `jscpd` | 重複程式碼偵測（選用） | `npm install -g jscpd` |
+| `coverlet` | 測試覆蓋率（選用） | `dotnet tool install -g coverlet.console` |
+
+> **缺少 python3 的 script？** Claude 會在執行時臨時生成再執行，不需要事先準備。
+
+---
+
 ## 快速同步到新機器
 
 ```bash
@@ -101,4 +151,7 @@ cd claude-config
 # 安裝所有自建 skills
 mkdir -p ~/.claude/skills/cursor-agent
 cp skills/cursor-agent/SKILL.md ~/.claude/skills/cursor-agent/SKILL.md
+
+mkdir -p ~/.claude/skills/hims-code-archaeologist
+cp skills/hims-code-archaeologist/SKILL.md ~/.claude/skills/hims-code-archaeologist/SKILL.md
 ```
